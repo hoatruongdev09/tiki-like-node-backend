@@ -13,5 +13,7 @@ routes.get('/addresses', customerAuth, customerController.getCustomerAddresses)
 routes.post('/add-address', customerAuth, customerController.addNewAddress)
 routes.post('/delete-address/:id', customerAuth, customerController.deleteAddress)
 routes.post('/set-default-address/:id', customerAuth, customerController.setDefaultAddress)
+routes.post('/update-address/:id', customerAuth, customerController.updateAddress)
+routes.get('/default-address', customerAuth, customerController.getDefaultAddress)
 
 export default routes

@@ -3,7 +3,6 @@ import Address from '../models/address'
 import CustomerAddress from '../models/customer-address'
 import { Request, Response, NextFunction } from 'express'
 import ExtendedCustomerRequest from '../utils/extended-request'
-import { where } from 'sequelize/types'
 
 
 export default class CustomerController {
@@ -102,12 +101,15 @@ export default class CustomerController {
             })
             const modifiedAddress = addresses.map(address => ({
                 id: address.getDataValue('id'),
+                firstName: address.getDataValue('firstName'),
+                lastName: address.getDataValue('lastName'),
+                phone: address.getDataValue('phone'),
                 country: address.getDataValue('country'),
                 city: address.getDataValue('city'),
                 ward: address.getDataValue('ward'),
                 address: address.getDataValue('address'),
                 address_type: address.getDataValue('address_type'),
-                default_address: defaultAddress == address.getDataValue('id')
+                defaultAddress: defaultAddress == address.getDataValue('id')
             }))
             console.log("WTFFF, ", modifiedAddress)
             res.status(200).json(modifiedAddress)
@@ -167,7 +169,7 @@ export default class CustomerController {
         const { id } = req.params
         try {
             const numberOfAddress = await Address.count({
-                where: { id: id },
+                where: { id: id, deleted: false },
                 distinct: true,
                 attributes: ['id']
             })
@@ -177,6 +179,60 @@ export default class CustomerController {
             req.userData?.setDataValue('default_address', id)
             await req.userData?.save()
             return res.status(200).json({ message: 'oke' })
+        } catch (error) {
+            res.status(500).json(error)
+        }
+    }
+    async getDefaultAddress(req: ExtendedCustomerRequest, res: Response, next: NextFunction) {
+        const defaultAddress = req.userData?.getDataValue('default_address')
+        if (defaultAddress === null) {
+            return res.status(404).json({ message: 'user has no default address' })
+        }
+        try {
+
+            const address = await Address.findByPk(defaultAddress)
+            return res.status(200).json(address)
+        } catch (error) {
+            res.status(500).json(error)
+        }
+    }
+    async updateAddress(req: ExtendedCustomerRequest, res: Response, next: NextFunction) {
+        const { id } = req.params
+        try {
+            const numberOfAddress = await Address.count({
+                where: { id: id, deleted: false },
+                distinct: true,
+                attributes: ['id']
+            })
+            if (numberOfAddress == 0) {
+                return res.status(400).json({ message: 'user do not have this address' })
+            }
+            const { firstName, lastName, phone, country, city, ward, address, address_type, defaultAddress } = req.body
+            const affectedRow = await Address.update({
+                firstName: firstName,
+                lastName: lastName,
+                phone: phone,
+                country: country,
+                city: city,
+                ward: ward,
+                address: address,
+                address_type: address_type,
+                defaultAddress: defaultAddress
+            }, {
+                where: {
+                    id: id,
+                    deleted: false
+                }
+            })
+            if (defaultAddress) {
+                req.userData?.setDataValue('default_address', id)
+            } else {
+                if (req.userData?.getDataValue('default_address') === id) {
+                    req.userData?.setDataValue('default_address', null)
+                }
+            }
+            await req.userData?.save()
+            res.status(200).json({ message: 'oke', affectedRow })
         } catch (error) {
             res.status(500).json(error)
         }

@@ -5,6 +5,10 @@ import credential from './middlewares/credential'
 
 import user from './routes/customer'
 import auth from './routes/auth'
+import category from './routes/category'
+import product from './routes/product'
+
+import prepareData from '../prepare-data'
 
 const app = express()
 
@@ -22,9 +26,15 @@ app.use(credential)
 
 app.use("/auth", auth)
 app.use("/user", user)
+app.use("/category", category)
+app.use("/product", product)
 
-sequelize.sync({ force: false }).then((result) => {
-    console.log(result)
+const force = false
+
+sequelize.sync({ force: force }).then((result) => {
+    if (force) {
+        prepareData()
+    }
 }).catch((error) => {
     console.error(error)
 })
