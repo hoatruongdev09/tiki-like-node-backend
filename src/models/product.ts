@@ -22,13 +22,22 @@ const Product = sequelize.define('product', {
         type: DataTypes.STRING,
     },
     longDescription: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
+    },
+    specifications: {
+        type: DataTypes.JSON,
+        defaultValue: null
     },
     price: {
         type: DataTypes.DOUBLE,
         allowNull: false,
         defaultValue: 0
     },
+    discount: {
+        type: DataTypes.BIGINT,
+        defaultValue: 0
+    }
+    ,
     soldCount: {
         type: DataTypes.INTEGER,
         defaultValue: 0

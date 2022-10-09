@@ -5,5 +5,6 @@ const productController = new ProductController()
 
 routes.get('/', productController.getAllProduct)
 routes.get('/detail/:id', productController.getProductDetail)
+routes.get('/details', productController.getProductsDetail)
 
 export default routes

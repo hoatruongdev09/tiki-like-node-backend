@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from 'express'
+import { QueryTypes } from 'sequelize'
 import ExtendedCustomerRequest from '../utils/extended-request'
 import Product from '../models/product'
+import ProductImage from '../models/product-image'
 import sequelize from '../utils/database'
-import { QueryTypes } from 'sequelize'
 import CountModel from '../interfaces/CountModel'
+import ProductIdsData from '../interfaces/ProductIDsData'
 
 export default class ProductController {
 
@@ -108,13 +110,44 @@ export default class ProductController {
                 replacements: { productId: id },
                 type: QueryTypes.SELECT,
             })
+            const images = await ProductImage.findAll({ where: { productId: id } })
             if (product.length != 0) {
-                res.status(200).json(product[0])
+                res.status(200).json({ product: product[0], images })
             } else {
                 res.status(404).json({ message: 'product is not found' })
             }
         } catch (error) {
             res.status(500).json(error)
         }
+    }
+
+    async getProductsDetail(req: Request, res: Response, next: NextFunction) {
+        if (req.query.ids) {
+            const queryIds = req.query.ids as string
+            const ids = queryIds.split(',')
+            try {
+
+                const products = await sequelize.query(`
+                    SELECT products.id, products.name, products.price, products.discount, products.displayImageUrl, products.stockCount, products.deleted, categories.name as categoryName, categories.parentId as categoryParentId,
+                        manufacturers.name as manufacturerName,
+                        stores.name as storeName
+                    FROM products JOIN categories ON products.categoryId = categories.id
+                        JOIN stores ON products.storeId = stores.id
+                        JOIN manufacturers ON products.manufacturerId = manufacturers.id
+                    WHERE 
+                        products.id IN (:productIds)
+                `, {
+                    replacements: { productIds: ids },
+                    type: QueryTypes.SELECT,
+                })
+
+                res.status(200).json(products)
+            } catch (error) {
+                res.status(500).json(error)
+            }
+        } else {
+            res.status(400).json({ message: "product ids not valid" })
+        }
+
     }
 }

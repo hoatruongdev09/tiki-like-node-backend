@@ -7,6 +7,7 @@ import user from './routes/customer'
 import auth from './routes/auth'
 import category from './routes/category'
 import product from './routes/product'
+import order from './routes/order'
 
 import prepareData from '../prepare-data'
 
@@ -28,13 +29,14 @@ app.use("/auth", auth)
 app.use("/user", user)
 app.use("/category", category)
 app.use("/product", product)
+app.use("/order", order)
 
 const force = false
 
 sequelize.sync({ force: force }).then((result) => {
-    if (force) {
-        prepareData()
-    }
+    // if (force) {
+    //     prepareData()
+    // }
 }).catch((error) => {
     console.error(error)
 })

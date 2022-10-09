@@ -111,7 +111,6 @@ export default class CustomerController {
                 address_type: address.getDataValue('address_type'),
                 defaultAddress: defaultAddress == address.getDataValue('id')
             }))
-            console.log("WTFFF, ", modifiedAddress)
             res.status(200).json(modifiedAddress)
         } catch (error) {
             console.error(error)
