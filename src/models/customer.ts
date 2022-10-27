@@ -7,7 +7,7 @@ import Address from './address'
 
 const Customer = sequelize.define('customer', {
     id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.BIGINT,
         autoIncrement: true,
         allowNull: false,
         primaryKey: true

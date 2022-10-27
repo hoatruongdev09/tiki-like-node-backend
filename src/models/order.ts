@@ -61,6 +61,10 @@ const Order = sequelize.define('order', {
         type: DOUBLE,
         allowNull: false,
     },
+    userId: {
+        type: DataTypes.BIGINT,
+        allowNull: false
+    },
     couponId: {
         type: DataTypes.BIGINT
     },

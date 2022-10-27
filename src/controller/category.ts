@@ -94,7 +94,14 @@ export default class CategoryController {
         try {
             let category = await Category.findOne({
                 where: {
-                    id: id,
+                    [Op.or]: [
+                        { id: id },
+                        {
+                            name: {
+                                [Op.like]: `%${id}%`
+                            }
+                        }
+                    ],
                     deleted: false
                 }
             })
@@ -104,7 +111,14 @@ export default class CategoryController {
                 while (parentId) {
                     category = await Category.findOne({
                         where: {
-                            id: parentId,
+                            [Op.or]: [
+                                { id: parentId },
+                                {
+                                    name: {
+                                        [Op.like]: `%${parentId}%`
+                                    }
+                                }
+                            ],
                             deleted: false
                         }
                     })

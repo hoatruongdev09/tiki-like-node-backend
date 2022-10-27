@@ -8,6 +8,8 @@ import auth from './routes/auth'
 import category from './routes/category'
 import product from './routes/product'
 import order from './routes/order'
+import store from './routes/store'
+import brand from './routes/brand'
 
 import prepareData from '../prepare-data'
 
@@ -30,6 +32,8 @@ app.use("/user", user)
 app.use("/category", category)
 app.use("/product", product)
 app.use("/order", order)
+app.use("/store", store)
+app.use("/brand", brand)
 
 const force = false
 

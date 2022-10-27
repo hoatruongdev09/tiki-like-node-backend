@@ -50,6 +50,10 @@ const Product = sequelize.define('product', {
         type: DataTypes.BIGINT,
         allowNull: false
     },
+    brandId: {
+        type: DataTypes.BIGINT,
+        allowNull: false
+    },
     storeId: {
         type: DataTypes.BIGINT,
         allowNull: false,
@@ -57,6 +61,10 @@ const Product = sequelize.define('product', {
     manufacturerId: {
         type: DataTypes.BIGINT,
         allowNull: false
+    },
+    averageRate: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0
     },
     deleted: {
         type: DataTypes.BOOLEAN,
