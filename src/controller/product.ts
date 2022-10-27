@@ -22,9 +22,14 @@ export default class ProductController {
                         JOIN manufacturers ON products.manufacturerId = manufacturers.id
                         JOIN sellers ON sellers.id = stores.ownerId
                         JOIN brands ON brands.id = products.brandId
+                        JOIN (
+                            SELECT products.id as id, COUNT(reviews.customerId) / SUM(rate) as averageRate 
+                            FROM products LEFT OUTER JOIN reviews ON products.id = reviews.productId 
+                            GROUP BY products.id
+                            )q ON q.id = products.id
                         WHERE products.deleted = :deleted
                                 AND (products.name LIKE :productName OR :productName = '')
-                                AND (FLOOR(products.averageRate) IN (:stars) OR :isEmptyStars)
+                                AND (FLOOR(q.averageRate) IN (:stars) OR :isEmptyStars)
                                 AND (products.price >= :minPrice OR :minPrice = -1)
                                 AND (products.price <= :maxPrice OR :maxPrice = -1)
                                 AND (stores.id IN (:storeId) OR :isEmptyStoreId)
@@ -64,16 +69,21 @@ export default class ProductController {
             console.log(productsCount)
 
             const products = await sequelize.query(`
-                SELECT products.* 
+                SELECT products.*, q.averageRate as rate
                 FROM 
                 products JOIN categories ON products.categoryId = categories.id
                             JOIN stores ON products.storeId = stores.id
                             JOIN manufacturers ON products.manufacturerId = manufacturers.id
                             JOIN sellers ON sellers.id = stores.ownerId
                             JOIN brands ON brands.id = products.brandId 
+                            JOIN (
+								SELECT products.id as id, COUNT(reviews.customerId) / SUM(rate) as averageRate 
+                                FROM products LEFT OUTER JOIN reviews ON products.id = reviews.productId 
+                                GROUP BY products.id
+                                )q ON q.id = products.id
                             WHERE products.deleted = :deleted
                                 AND (products.name LIKE :productName OR :productName = '')
-                                AND (FLOOR(products.averageRate) IN (:stars) OR :isEmptyStars)
+                                AND (FLOOR(q.averageRate) IN (:stars) OR :isEmptyStars)
                                 AND (products.price >= :minPrice OR :minPrice = -1)
                                 AND (products.price <= :maxPrice OR :maxPrice = -1)
                                 AND (stores.id IN (:storeId) OR :isEmptyStoreId)

@@ -62,10 +62,6 @@ const Product = sequelize.define('product', {
         type: DataTypes.BIGINT,
         allowNull: false
     },
-    averageRate: {
-        type: DataTypes.FLOAT,
-        defaultValue: 0
-    },
     deleted: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
